@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        ul{
+            margin-right: 10px;
+        }
+       
+    </style>
+    <!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+<!-- Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script>
+       $.getJSON('https://sujith-sairam.github.io/api/data.json', function(data) {
+          var card_container = $('.card-container'); 
+          var row_container = $('.row');
+          
+          for(var j=0;j<data.products[3].items.length;j++){
+            var card = $('<div>').addClass('col-md-3 col-lg-3 mb-2');
+            var productCard = $('<div>').addClass('card product-card card-sm');
+            var image = $('<img>').addClass('card-img-top').attr('src', data.products[3].items[j].imageUrl).attr('alt', 'Product Image').css({'max-width': '320px', 'max-height': '250px'});
+            var cardBody = $('<div>').addClass('card-body');
+            var title = $('<h5>').addClass('card-title mb-0').text(data.products[3].items[j].name);
+            var price = $('<p>').addClass('card-text font-weight-bold mb-0').text('$' + data.products[3].items[j].price.toFixed(2));
+            var addToCart = $('<button>').addClass('btn btn-primary btn-block add-to-cart').attr('data-id', data.products[3].items[j].id).text('Add to Cart');
+            
+            cardBody.append(title, price, addToCart);
+            productCard.append(image, cardBody);
+            card.append(productCard);
+            row_container.append(card);
+          }
+
+        var totalQuantity = 0;
+        var quantitySpan = $('.quantity');
+        $(function(){
+          var cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+          if(cartItems.length == 0){
+            quantitySpan.text(totalQuantity);
+          }else{
+          for(var i=0; i<cartItems.length; i++){
+                    totalQuantity = totalQuantity + cartItems[i].quantity;
+                  }
+                quantitySpan.text(totalQuantity);
+                }
+        })
+        $('.add-to-cart').on('click', function() {
+        var itemId = $(this).data('id');
+        var cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+        var item = data.products[3].items.find(function(i) { return i.id == itemId; });
+        var existingItem = cartItems.find(function(i) { return i.id == itemId; });
+       
+        var totalQuantity = 0;
+            if(existingItem) {
+              existingItem.quantity++;
+              for(var i=0; i<cartItems.length; i++){
+                    totalQuantity = totalQuantity + cartItems[i].quantity;
+                  }
+                quantitySpan.text(totalQuantity);
+            } else {
+              cartItems.push({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                imageUrl: item.imageUrl,
+                quantity: 1
+              });
+              for(var i=0; i<cartItems.length; i++){
+                    totalQuantity = totalQuantity + cartItems[i].quantity;
+                  }
+                quantitySpan.text(totalQuantity);
+            }
+        
+        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+        alert('Item added to cart!');
+      });
+        }).fail(function() {
+          // This function is called if the API call fails
+          alert('Failed to fetch data from API');
+        });
+
+    </script>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+          <a class="navbar-brand" href="#">Shopping Website</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item active">
+                <a class="nav-link" href="hats.html">Hats</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="mens.html">Mens</a>
+              </li>
+              <li class="nav-item active">
+                <a class="nav-link" href="womens.html">Womens</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="shoes.html">Shoes</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="jackets.html">Jackets</a>
+              </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+              <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <button type="button" class="btn btn-primary">
+                  Cart <span class="badge badge-light quantity"></span>
+                </button>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Login</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Sign Up</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    <div class="card-container">
+      <div class="row">
+
+      </div>   
+    </div>
+    
+              
+</body>
+</html>
