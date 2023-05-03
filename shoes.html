@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-        ul{
-            margin-right: 10px;
+        li{
+            margin-left: 60px;
         }
        
     </style>
@@ -25,24 +25,28 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script>
-       $.getJSON('https://sujith-sairam.github.io/api/data.json', function(data) {
-          var card_container = $('.card-container'); 
-          var row_container = $('.row');
-          
-          for(var j=0;j<data.products[1].items.length;j++){
+       var products = [];
+    // Load the products from the API and store them in the products array
+    $.getJSON('https://sujith-sairam.github.io/api/data.json', function(data) {
+        products = data.products[1].items;
+        var card_container = $('.card-container');
+        
+        var row_container = $('.row');
+                
+        for(var j=0; j<products.length; j++){
             var card = $('<div>').addClass('col-md-3 col-lg-3 mb-2');
             var productCard = $('<div>').addClass('card product-card card-sm');
-            var image = $('<img>').addClass('card-img-top').attr('src', data.products[1].items[j].imageUrl).attr('alt', 'Product Image').css({'max-width': '320px', 'max-height': '250px'});
+            var image = $('<img>').addClass('card-img-top').attr('src', products[j].imageUrl).attr('alt', 'Product Image').css({'max-width': '320px', 'max-height': '250px'});
             var cardBody = $('<div>').addClass('card-body');
-            var title = $('<h5>').addClass('card-title mb-0').text(data.products[1].items[j].name);
-            var price = $('<p>').addClass('card-text font-weight-bold mb-0').text('$' + data.products[1].items[j].price.toFixed(2));
-            var addToCart = $('<button>').addClass('btn btn-primary btn-block add-to-cart').attr('data-id', data.products[1].items[j].id).text('Add to Cart');
-            
+            var title = $('<h5>').addClass('card-title mb-2').text(products[j].name);
+            var price = $('<p>').addClass('card-text font-weight-bold mb-2').text('$' + products[j].price.toFixed(2));
+            var addToCart = $('<button>').addClass('btn btn-primary btn-block add-to-cart').attr('data-id', products[j].id).text('Add to Cart');
+                    
             cardBody.append(title, price, addToCart);
             productCard.append(image, cardBody);
             card.append(productCard);
             row_container.append(card);
-          }
+        }
 
         var totalQuantity = 0;
         var quantitySpan = $('.quantity');
@@ -86,12 +90,50 @@
         
         localStorage.setItem('cartItems', JSON.stringify(cartItems));
         alert('Item added to cart!');
-      });
-        }).fail(function() {
-          // This function is called if the API call fails
-          alert('Failed to fetch data from API');
+          })
+    // Function to display the products
+  }).fail(function() {
+    // This function is called if the API call fails
+    alert('Failed to fetch data from API');
+});
+$(function() {
+        var inputValue = "";
+        var filteredProducts;
+        $(".input").on("keyup",function() {
+          inputValue = $(this).val();
+          //console.log("Current input value: " + inputValue); 
+             filteredProducts = products.filter(function(product) {
+                  return product.name.toLowerCase().includes(inputValue.toLowerCase());
+              });
+              console.log(filteredProducts);
+              displayProducts(filteredProducts);
         });
+        
+  });
 
+        function displayProducts(products) {
+          
+        var card_container = $('.card-container');
+        var row_container = $('.row');
+        row_container.empty();
+                
+        for(var j=0; j<products.length; j++){
+            var card = $('<div>').addClass('col-md-3 col-lg-3 mb-2');
+            var productCard = $('<div>').addClass('card product-card card-sm');
+            var image = $('<img>').addClass('card-img-top').attr('src', products[j].imageUrl).attr('alt', 'Product Image').css({'max-width': '320px', 'max-height': '250px'});
+            var cardBody = $('<div>').addClass('card-body');
+            var title = $('<h5>').addClass('card-title mb-2').text(products[j].name);
+            var price = $('<p>').addClass('card-text font-weight-bold mb-2').text('$' + products[j].price.toFixed(2));
+            var addToCart = $('<button>').addClass('btn btn-primary btn-block add-to-cart').attr('data-id', products[j].id).text('Add to Cart');
+                    
+            cardBody.append(title, price, addToCart);
+            productCard.append(image, cardBody);
+            card.append(productCard);
+            row_container.append(card);
+           
+        }
+
+    }
     </script>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
@@ -102,6 +144,9 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mr-auto">
+              <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2 input" type="search" placeholder="Search" aria-label="Search">
+              </form>
               <li class="nav-item active">
                 <a class="nav-link" href="hats.html">Hats</a>
               </li>
@@ -118,22 +163,13 @@
                 <a class="nav-link" href="jackets.html">Jackets</a>
               </li>
             </ul>
-            <form class="form-inline my-2 my-lg-0">
-              <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-              <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form>
             <ul class="navbar-nav ml-auto">
               <li class="nav-item">
                 <button type="button" class="btn btn-primary">
                   Cart <span class="badge badge-light quantity"></span>
                 </button>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Login</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Sign Up</a>
-              </li>
+              
             </ul>
           </div>
         </div>
